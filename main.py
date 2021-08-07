@@ -1,20 +1,46 @@
 import streamlit as st
-import plotly.express as px
 import pandas as pd
 
-from resource import state_t, death_t, hospital, icu, clusters
-from utils import generate_line_chart, generate_medical_chart
-
-single_state_list = state_t.loc[:, ~state_t.columns.isin(['Total', 'Date'])].columns.values.tolist()
+from resource import state_t, death_t, hospital, icu, clusters, malaysia_cases, malaysia_death, malaysia_vaccine_reg, malaysia_vaccine, single_state_list, reg_t, vaccine_data_date, vaccination_df
+from utils import generate_line_chart, generate_medical_chart, generate_vaccination_chart
 
 st.title('Malaysia Covid Data with Streamlit')
+st.text('For education purpose only')
 
 st.title('Summary')
 
 latest_date = state_t['Date'][-1]
 
 ## Summary
-st.text(f'Showing data on: {latest_date}')
+total_covid_cases = malaysia_cases['cases_new'].sum()
+total_covid_deaths = malaysia_death['deaths_new'].sum()
+total_reg_vaccine = malaysia_vaccine_reg.total.iat[-1]
+dose1_vaccine = malaysia_vaccine.dose1_cumul.iat[-1]
+dose2_vaccine = malaysia_vaccine.dose2_cumul.iat[-1]
+# percent_population_vaccinated = (cumul_vaccinated / 32657400) * 100
+
+st.text('Covid Cases in Malaysia')
+fig = generate_line_chart(malaysia_cases, 'cases_new', 'Number of Cases')
+st.plotly_chart(fig)
+
+st.text('Covid Deaths in Malaysia')
+fig = generate_line_chart(malaysia_death, 'deaths_new', 'Number of Cases')
+st.plotly_chart(fig)
+
+st.text('Vaccination Chart')
+fig = generate_vaccination_chart(malaysia_vaccine_reg, malaysia_vaccine)
+st.plotly_chart(fig)
+
+st.text('-' * 10)
+st.text(f'Total covid cases in Malaysia: {total_covid_cases}')
+st.text(f'Total covid deaths in Malaysia: {total_covid_deaths}')
+st.text(f'Total registered for vaccination in Malaysia: {total_reg_vaccine}')
+st.text(f'Percentage of population registered for vaccination: {round((total_reg_vaccine / 32657400) * 100, 1)}%')
+st.text(f'Percentage of population vaccinated (Dose 1): {round((dose1_vaccine / 32657400) * 100, 1)}% ({dose1_vaccine})')
+st.text(f'Percentage of population vaccinated (Dose 2): {round((dose2_vaccine / 32657400) * 100, 1)}% ({dose2_vaccine})')
+st.text('-' * 10)
+
+st.text(f'Most recent covid data update: {latest_date}')
 
 death_s = pd.DataFrame(death_t[death_t['Date'] == latest_date].T).reset_index()
 death_s.columns = ['State', 'Deaths']
@@ -43,22 +69,37 @@ else:
         single_state_list)
 
 st.title('Cases')
+st.text('Cases on individual state')
 if selected_options:
     
-    fig = generate_line_chart(state_t, selected_options)
+    fig = generate_line_chart(state_t, selected_options, 'Number of Cases')
     st.plotly_chart(fig)
 else:
 
     st.text('<--- Pick a State')
 
 st.title('Deaths')
+st.text('Cases on individual state')
 if selected_options:
     
-    fig = generate_line_chart(death_t, selected_options)
+    fig = generate_line_chart(death_t, selected_options, 'Number of Cases')
     st.plotly_chart(fig)
 else:
 
     st.text('<--- Pick a State')
+
+st.title('Vaccine Registration')
+st.text('Cases on individual state')
+if selected_options:
+    
+    fig = generate_line_chart(reg_t, selected_options, 'Percentage of Population Registered (%)')
+    st.plotly_chart(fig)
+else:
+
+    st.text('<--- Pick a State')
+
+st.dataframe(vaccination_df)
+st.text(f'Last updated: {vaccine_data_date}')
 
 
 ## Medical
@@ -87,7 +128,7 @@ if selected_radio:
     cluster_category = cluster_one.category.value_counts().reset_index().set_index('index')
 
     if len(cluster_one) > 0:
-        st.text('Currently Active')
+        st.text(f'Currently Active in {selected_radio}')
         st.dataframe(cluster_one)
         st.dataframe(cluster_category)
     else:
@@ -97,11 +138,22 @@ if selected_radio:
     cluster_category = cluster_one.category.value_counts().reset_index().set_index('index')
 
     if len(cluster_one) > 0:
-        st.text('Historical')
+        st.text(f'Historical clusters in {selected_radio}')
         st.dataframe(cluster_one)
         st.dataframe(cluster_category)
     else:
         st.text('No Data')
 
 
+
+
+
+
+
+
+
+
+
+
 st.text('Data Source: https://github.com/MoH-Malaysia/covid19-public')
+st.text('Data Source: https://github.com/CITF-Malaysia/citf-public')
