@@ -52,8 +52,8 @@ def generate_vaccination_chart(malaysia_reg, malaysia_vaccine):
 
     random_x = df_merge['date']
     random_y0 = df_merge['total']
-    random_y1 = df_merge['dose1_cumul']
-    random_y2 = df_merge['dose2_cumul']
+    random_y1 = df_merge['daily_partial']
+    random_y2 = df_merge['daily_full']
     random_y3 = df_merge['total_population']
 
     # Create traces

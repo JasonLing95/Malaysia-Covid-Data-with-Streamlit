@@ -15,8 +15,8 @@ latest_date = state_t['Date'][-1]
 total_covid_cases = malaysia_cases['cases_new'].sum()
 total_covid_deaths = malaysia_death['deaths_new'].sum()
 total_reg_vaccine = malaysia_vaccine_reg.total.iat[-1]
-dose1_vaccine = malaysia_vaccine.dose1_cumul.iat[-1]
-dose2_vaccine = malaysia_vaccine.dose2_cumul.iat[-1]
+dose1_vaccine = malaysia_vaccine.daily_partial.iat[-1]
+dose2_vaccine = malaysia_vaccine.daily_full.iat[-1]
 # percent_population_vaccinated = (cumul_vaccinated / 32657400) * 100
 
 st.text('Covid Cases in Malaysia')

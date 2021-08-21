@@ -60,8 +60,8 @@ def change_percentage(state, dose):
   dose = round((dose / population[population.state == state]['pop'].values[0]) * 100, 2)
   return str(dose) + '%'
 
-vaccine_dos = state_vaccine[['state', 'dose1_cumul', 'dose2_cumul', 'date']].sort_values('date').groupby('state').tail(1)
-vaccine_dos['dose1_percent'] =  vaccine_dos.apply(lambda x: change_percentage(x['state'], x['dose1_cumul']), axis=1)
-vaccine_dos['dose2_percent'] =  vaccine_dos.apply(lambda x: change_percentage(x['state'], x['dose2_cumul']), axis=1)
+vaccine_dos = state_vaccine[['state', 'daily_partial', 'daily_full', 'date']].sort_values('date').groupby('state').tail(1)
+vaccine_dos['dose1_percent'] =  vaccine_dos.apply(lambda x: change_percentage(x['state'], x['daily_partial']), axis=1)
+vaccine_dos['dose2_percent'] =  vaccine_dos.apply(lambda x: change_percentage(x['state'], x['daily_full']), axis=1)
 vaccine_data_date = vaccine_dos.date.tail(1).values[0]
 vaccination_df = vaccine_dos[['state', 'dose1_percent', 'dose2_percent']].set_index('state').rename(columns={'dose1_percent': 'Dose 1', 'dose2_percent': 'Dose 2'})
